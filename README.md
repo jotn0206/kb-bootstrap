@@ -45,9 +45,23 @@ P2 阶段会随知识库一起生成**七份日常执行清单**，建好库后�
 
 同时强化：发布前**硬门禁**（API 凭证 / IP 白名单 / 封面 PNG，缺一即阻断）、**六条执行铁律**（禁止偷换技能、禁止伪造"已跑通"）。
 
+## v1.2 新增（2026-09-07）
+
+**离线技能包 + 软件离线包**：完整工具包附带五工作流的全部技能与本机软件，新机器不用联网装依赖。
+
+```bash
+bash 安装技能.sh                  # 11 个技能 + pptxgenjs（54 MB，含已装 node_modules）
+bash 安装技能.sh --with-software  # 再加 Obsidian / bun / node（119 MB）
+```
+
+- **凭证三处核查**：发布前自检从 2 处扩为 3 处（新增技能目录内 `<WS>/skills/baoyu-post-to-wechat/EXTEND.md`）——该处最常被漏查，误判会导致"明明配了却说没配"。
+- **脱敏**：技能目录内的 `.env` / `EXTEND.md` 可能含真实 AppSecret，外发前必须删除，已用 `.env.example` / `EXTEND.example.md` 占位。
+
 ## 依赖（P4 工作流前置）
 
 技能运行时会引导安装：`humanizer-zh`、`ian-xiaohei-illustrations`、`wechat-publish-template`、`baoyu-post-to-wechat`、`wechat-article-search`、`opencli`、`knowledge-base-dual-engine`。
+
+> 这些依赖已随**完整工具包的 `技能包/` 目录离线提供**（含 node_modules），用 `安装技能.sh` 一次装完，无需逐个 npm install。
 
 ## 许可
 
