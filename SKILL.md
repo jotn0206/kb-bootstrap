@@ -110,6 +110,29 @@ P2 阶段要把以下 7 份清单**一并生成到 `00-配置/`**，并在 `AGEN
 | `20-工作流5-内容创作执行清单.md` | 文稿模板 + 禁用词扫描 + 脱敏复扫 |
 | `21-工作流总纲-技能核查与执行纪律.md` | 五工作流导航 + 全局技能核查表 + 六条铁律 |
 
+### P0 之前：先装技能与软件（离线，不等联网）
+
+工具包附 **离线技能包** 与 **软件离线包**，新机器按此顺序装，可省去 npm install 与下载等待：
+
+```bash
+bash 安装技能.sh                  # 11 个技能 + pptxgenjs（54 MB，含已装 node_modules）
+bash 安装技能.sh --with-software  # 再加 Obsidian / bun / node（119 MB）
+```
+
+| 来源 | 内容 | 装到哪 |
+|------|------|--------|
+| `技能包/` | `kb-bootstrap`、`knowledge-base-dual-engine`、`ian-xiaohei-illustrations` | 用户级 `~/.workbuddy/skills/` |
+| `技能包/` | `wechat-article-search`、`baoyu-post-to-wechat`、`wechat-publish-template`、`humanizer-zh`、`frontend-design`、`pptx`、`guizang-ppt-skill`、`opencli` | 项目级 `<WS>/skills/` |
+| `技能包/_npm依赖/` | `pptxgenjs` | `<WS>/node_modules/` |
+| `软件离线包/` | Obsidian（Linux ARM64）、bun、node | 本机 |
+
+装完仍需人工完成两项（AI 代不了）：
+1. **Obsidian Web Clipper 扩展**：浏览器商店装 + 与 Obsidian 配对 API Key（扩展受签名限制，无法离线分发）
+2. **微信凭证三处配置**（见「发布前硬门禁」第 1 条）
+
+> ⚠️ 技能目录内的 `.env` / `EXTEND.md` 可能含**真实 AppSecret**。工具包外发前必须删除，
+> 用 `.env.example` / `EXTEND.example.md` 占位；若曾外泄，到 mp.weixin.qq.com 重置 AppSecret。
+
 **六条执行铁律（违反即返工）**：
 1. **技能不偷换**：规定用 `wechat-article-search` 就不用 WebSearch 顶替。正确顺序：**先 `ls` 实测 → 调规定技能 → 失败才兜底 → 兜底必在成果里标注**。
 2. **每步可验证**：输出"通过/不通过 + 证据"（MD5、页数、grep 命中数、HTTP 码），禁止只说"已完成"。
@@ -198,8 +221,14 @@ P2 阶段要把以下 7 份清单**一并生成到 `00-配置/`**，并在 `AGEN
 
 发布前必须自检以下 5 项，**任一 FAIL 立即停止并引导修复**，不得直接尝试发布：
 
-1. **API 凭证** —— `.baoyu-skills/.env`（项目级 `<cwd>/.baoyu-skills/.env` 或用户级 `~/.baoyu-skills/.env`）含 `WECHAT_APP_ID` 与 `WECHAT_APP_SECRET`。缺失 → 引导到 mp.weixin.qq.com → 开发 → 基本配置 取值并写入，**禁止无凭证发布**。
-2. **EXTEND.md 偏好** —— `.baoyu-skills/baoyu-post-to-wechat/EXTEND.md` 存在。缺失会触发该技能 **BLOCKING 首次配置**，后续步骤全部卡死。
+1. **API 凭证** —— `WECHAT_APP_ID` 与 `WECHAT_APP_SECRET`，**三处都要查，命中任一即通过**：
+   - `<cwd>/.baoyu-skills/.env`（项目级）
+   - `~/.baoyu-skills/.env`（用户级）
+   - **`<WS>/skills/baoyu-post-to-wechat/EXTEND.md`（技能目录内，最常被漏查，实际最常配在这）**
+
+   三处全无 → 引导到 mp.weixin.qq.com → 开发 → 基本配置 取值并写入，**禁止无凭证发布**。
+   > ⚠️ 实锤教训：曾只查前两处就判"凭证全缺"，实际凭证在技能目录的 `EXTEND.md` 里。**只查两处 = 误判**。
+2. **EXTEND.md 偏好** —— 同样三处查（`<cwd>/.baoyu-skills/…`、`~/.baoyu-skills/…`、`<WS>/skills/baoyu-post-to-wechat/EXTEND.md`）。三处全无才会触发该技能 **BLOCKING 首次配置**。
 3. **IP 白名单** —— 当前出口 IP（`curl -s ifconfig.me`）已加入 mp.weixin.qq.com 白名单，否则报 **40164**。注意家庭宽带 IP 会变，每次发布前复查。
 4. **封面 PNG** —— 900×383 的**真实 PNG 文件**（不是 HTML 设计源）。`news` 类型 `thumb_media_id` 必填，无封面发布失败。
 5. **接口权限** —— 公众号需有草稿箱/素材管理接口权限；个人未认证号可能无 `draft/add` 权限 → 降级 browser 方式发布。
@@ -225,14 +254,25 @@ P2 阶段要把以下 7 份清单**一并生成到 `00-配置/`**，并在 `AGEN
 
 ## 配套文件（工具包内）
 
-> 本技能**独立可用**——以下文件会在 P2 阶段由 AI 按你的身份自动生成，无需手动准备；如需现成模板也可从完整工具包获取。
-
 - `09-一键搭建提示词集.md` —— P0–P5 逐条提示词 + Master 总控，可直接复制给任意 AI 客户端
 - `10-信息采集表.md` —— P1 输入，用户提前填可省对话轮次
 - `11-验收测试清单.md` —— P3/P5 依据，含测试用例与验收标准
 - `15-知识卡片模板.md` —— P2 生成于 `00-配置/`，02_wiki 卡片统一 **10 字段**（强制套用，无模板=不入库）
 - `16~20-工作流N-*-执行清单.md` —— P2 生成于 `00-配置/`，五份工作流执行清单（采集 / 调研 / 发布 / PPT / 创作），含依赖核查、门禁、分步命令、通过标准、失败速查
 - `21-工作流总纲-技能核查与执行纪律.md` —— P2 生成于 `00-配置/`，五工作流导航 + 全局技能核查表 + 六条铁律
+
+> 本技能**独立可用**——以上文件会在 P2 阶段由 AI 按你的身份自动生成，无需手动准备；如需现成模板也可从完整工具包获取。
+
+## 离线技能包（省去联网安装）
+
+完整工具包另附两份离线资源，新机器开箱即用：
+
+- `技能包/`（54 MB）—— 本技能 + 另外 10 个工作流技能，含已装好的 `node_modules`，**不用 npm install**
+- `软件离线包/`（119 MB）—— Obsidian（Linux ARM64）、bun、node 运行时
+
+在工具包根目录执行 `bash 安装技能.sh` 即可自动装到用户级 / 项目级对应位置，装完自动校验。
+
+> 仍需人工完成：Obsidian Web Clipper 扩展（浏览器商店装 + 配对 API Key）、微信 API 凭证（三处任选一处配置）。
 
 ## 与日常运营技能的分工
 
